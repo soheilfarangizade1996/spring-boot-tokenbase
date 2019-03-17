@@ -27,13 +27,15 @@ public class JwtTokenProvider {
     private MyUserDetails myUserDetails;
 
     @PostConstruct
-    protected void init(){
+    protected void init() {
         secretkey = Base64.getEncoder().encodeToString(secretkey.getBytes());
     }
 
-    public String createToken(String username, List<RoleEnum> roles){
+    public String createToken(String username, List<RoleEnum> roles) {
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put("auth", roles.stream().map(s ->  new SimpleGrantedAuthority(s.getAuthority())).filter(Objects::nonNull).collect(Collectors.toList()));
+        claims.put("auth", roles.stream().map(s -> new SimpleGrantedAuthority(s.getName())).
+                filter(Objects::nonNull).collect(Collectors.toList()));
+
 
         Date nowDate = new Date();
         Date expireDate = new Date(nowDate.getTime() + validateTimeToken);
