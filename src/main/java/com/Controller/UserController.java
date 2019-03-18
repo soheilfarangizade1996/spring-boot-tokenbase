@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
@@ -28,5 +29,11 @@ public class UserController {
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public String signin(@RequestBody UserDTO userDTO){
         return userService.signIn(userDTO);
+    }
+
+
+    @RequestMapping(value = "/whoMi", method = RequestMethod.POST)
+    public User getUser(HttpServletRequest request){
+        return userService.getUserByToken(request);
     }
 }

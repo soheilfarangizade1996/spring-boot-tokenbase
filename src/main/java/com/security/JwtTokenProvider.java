@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -48,4 +49,13 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String getUserNameWithToken(String token){
+        String username = Jwts.parser().setSigningKey(secretkey).parseClaimsJws(token).getBody().getSubject();
+        return username;
+    }
+
+    public String resolveToken(HttpServletRequest request){
+        String token = request.getHeader("Authorization");
+        return token;
+    }
 }

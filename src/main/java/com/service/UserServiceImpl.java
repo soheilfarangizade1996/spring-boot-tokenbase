@@ -5,12 +5,14 @@ import com.model.User;
 import com.model.enu.RoleEnum;
 import com.repository.UserRepository;
 import com.security.JwtTokenProvider;
+import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +64,12 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+
+    @Override
+    public User getUserByToken(HttpServletRequest request) {
+        return userRepository.findByUsername(jwtTokenProvider.getUserNameWithToken(jwtTokenProvider.resolveToken(request)));
+    }
+
     private boolean checkExistUser(String username) {
         return userRepository.existsUserByUsername(username);
     }
@@ -92,6 +100,9 @@ public class UserServiceImpl implements UserService {
         user.setMessage("User Saved...");
         return user;
     }
+
+
+
 
 
 }
