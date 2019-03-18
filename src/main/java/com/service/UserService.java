@@ -10,4 +10,6 @@ public interface UserService {
     User findUserByUserName(String username);
 
     Map<User, String> signUp(UserDTO userDTO);
+
+    String signIn(UserDTO userDTO);
 }

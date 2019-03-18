@@ -6,8 +6,11 @@ import com.model.enu.RoleEnum;
 import com.repository.UserRepository;
 import com.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +28,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Override
     public User findUserByUserName(String username) {
@@ -37,18 +41,25 @@ public class UserServiceImpl implements UserService {
     public Map<User, String> signUp(UserDTO userDTO) {
         Map<User, String> map = new HashMap<>();
         User user = validateUserDTO(userDTO);
-        if (user.getStatusCode() == 200){
+        if (user.getStatusCode() == 200) {
             String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
             map.put(user, "token : " + token);
             return map;
         }
-        map.put(user, "token : "  + null);
+        map.put(user, "token : " + null);
         return map;
-        /*if (user != null){
+    }
+
+
+    @Override
+    public String signIn(UserDTO userDTO) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDTO.getUsername(), userDTO.getPassword()));
+        User user = userRepository.findByUsername(userDTO.getUsername());
+        if (user != null){
             String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
             return token;
         }
-        return null;*/
+        return null;
     }
 
     private boolean checkExistUser(String username) {
@@ -63,8 +74,8 @@ public class UserServiceImpl implements UserService {
             return userResult;
         }
 
-        boolean checkExist =  checkExistUser(userDTO.getUsername());
-        if (checkExist){
+        boolean checkExist = checkExistUser(userDTO.getUsername());
+        if (checkExist) {
             userResult.setMessage("User Exist");
             userResult.setStatusCode(302);
             return userResult;

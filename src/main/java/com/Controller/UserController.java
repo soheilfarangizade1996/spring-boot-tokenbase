@@ -25,4 +25,8 @@ public class UserController {
     }
 
 
+    @RequestMapping(value = "/signin", method = RequestMethod.POST)
+    public String signin(@RequestBody UserDTO userDTO){
+        return userService.signIn(userDTO);
+    }
 }
