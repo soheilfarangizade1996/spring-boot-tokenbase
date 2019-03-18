@@ -25,6 +25,13 @@ public class User {
     private List<RoleEnum> roles;
 
 
+    @Transient
+    private String message;
+
+    @Transient
+    private Integer statusCode;
+
+
     public Integer getId() {
         return id;
     }
@@ -71,6 +78,23 @@ public class User {
 
     public void setRoles(List<RoleEnum> roles) {
         this.roles = roles;
+    }
+
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public Integer getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(Integer statusCode) {
+        this.statusCode = statusCode;
     }
 
     @Override

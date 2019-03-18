@@ -21,7 +21,7 @@ public class JwtTokenProvider {
 
     private String secretkey = "secret-key";
 
-    private final Long validateTimeToken = 3600000L;
+    private final Long validateTimeToken = 600000L;  // 3600000L -> 1h
 
     @Autowired
     private MyUserDetails myUserDetails;

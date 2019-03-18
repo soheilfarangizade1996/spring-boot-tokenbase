@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,13 +34,21 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public String signUp(UserDTO userDTO) {
+    public Map<User, String> signUp(UserDTO userDTO) {
+        Map<User, String> map = new HashMap<>();
         User user = validateUserDTO(userDTO);
-        if (user != null){
+        if (user.getStatusCode() == 200){
+            String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
+            map.put(user, "token : " + token);
+            return map;
+        }
+        map.put(user, "token : "  + null);
+        return map;
+        /*if (user != null){
             String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
             return token;
         }
-        return null;
+        return null;*/
     }
 
     private boolean checkExistUser(String username) {
@@ -46,12 +56,18 @@ public class UserServiceImpl implements UserService {
     }
 
     private User validateUserDTO(UserDTO userDTO) {
-        if (userDTO == null || userDTO.getUsername() == null || userDTO.getPassword() == null)
-            return null;
+        User userResult = new User();
+        if (userDTO == null || userDTO.getUsername() == null || userDTO.getPassword() == null) {
+            userResult.setMessage("User Is Null");
+            userResult.setStatusCode(401);
+            return userResult;
+        }
 
         boolean checkExist =  checkExistUser(userDTO.getUsername());
         if (checkExist){
-            return null;
+            userResult.setMessage("User Exist");
+            userResult.setStatusCode(302);
+            return userResult;
         }
 
         User user = new User();
@@ -61,6 +77,8 @@ public class UserServiceImpl implements UserService {
         user.setEmail(userDTO.getEmail());
         user.setRoles(roleEnums);
         user = userRepository.save(user);
+        user.setStatusCode(200);
+        user.setMessage("User Saved...");
         return user;
     }
 
