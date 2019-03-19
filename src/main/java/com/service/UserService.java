@@ -1,18 +1,22 @@
 package com.service;
 
 import com.dto.UserDTO;
+import com.dto.UserResponseDTO;
 import com.model.User;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 public interface UserService {
 
     User findUserByUserName(String username);
 
-    Map<User, String> signUp(UserDTO userDTO);
+    UserResponseDTO signUp(UserDTO userDTO);
 
-    String signIn(UserDTO userDTO);
+    UserResponseDTO signIn(UserDTO userDTO);
 
-    User getUserByToken(HttpServletRequest request);
+    UserResponseDTO getUserByToken(HttpServletRequest request);
+
+    List<User> fetchAllUser(HttpServletRequest request);
 }

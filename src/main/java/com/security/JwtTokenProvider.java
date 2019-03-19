@@ -1,10 +1,13 @@
 package com.security;
 
+import com.exception.SecurityException;
 import com.model.enu.RoleEnum;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +25,7 @@ public class JwtTokenProvider {
 
     private String secretkey = "secret-key";
 
-    private final Long validateTimeToken = 600000L;  // 3600000L -> 1h
+    private final Long validateTimeToken = 180000L;  // 3600000L -> 1h / 10L * 6 *10000L 10min
 
     @Autowired
     private MyUserDetails myUserDetails;
@@ -58,5 +61,14 @@ public class JwtTokenProvider {
     public String resolveToken(HttpServletRequest request){
         String token = request.getHeader("Authorization");
         return token;
+    }
+
+    public boolean validateToken(String token){
+        try{
+            Jwts.parser().setSigningKey(secretkey).parseClaimsJws(token).getBody().getSubject();
+            return true;
+        }catch (JwtException | IllegalArgumentException e){
+            throw new SecurityException("Invalid Token", HttpStatus.NOT_FOUND);
+        }
     }
 }
