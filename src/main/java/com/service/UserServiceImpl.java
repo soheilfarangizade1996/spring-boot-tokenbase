@@ -7,7 +7,12 @@ import com.model.enu.RoleEnum;
 import com.repository.UserRepository;
 import com.security.JwtTokenProvider;
 import io.jsonwebtoken.Jwts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,9 +20,13 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends BaseService implements UserService {
+
+    private static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -31,6 +40,26 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+
+    private static final Map<String, List<User>> cacheUser = new ConcurrentHashMap<>();
+
+    private static final String CACHE_USER = "CACHE_USER";
+
+
+
+
+    @Override
+    @Scheduled(fixedRate = 2 * 60 * 1000)
+    public void cacheUserFromDatabase() {
+        logger.info("size CacheMapUser {}", (long) cacheUser.entrySet().size());
+        if (cacheUser.containsKey(CACHE_USER)) {
+            cacheUser.remove(CACHE_USER);
+            cacheUser.put(CACHE_USER, userRepository.findAll());
+        } else {
+            List<User> userList = userRepository.findAll();
+            cacheUser.put(CACHE_USER, userList);
+        }
+    }
 
     @Override
     public User findUserByUserName(String username) {
@@ -61,6 +90,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO signIn(UserDTO userDTO) {
         UserResponseDTO userResponseDTO = new UserResponseDTO();
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDTO.getUsername(), userDTO.getPassword()));
+        cacheUser.forEach((key, value) -> System.out.println(value));
         User user = userRepository.findByUsername(userDTO.getUsername());
         if (user != null) {
             String token = jwtTokenProvider.createToken(user.getUsername(), user.getRoles());
@@ -109,7 +139,9 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = new User();
-        List<RoleEnum> roleEnums = Arrays.asList(RoleEnum.ROLE_USER);
+        List<RoleEnum> roleEnums = new ArrayList<>();
+        roleEnums.add(RoleEnum.ROLE_ADMIN);
+        roleEnums.add(RoleEnum.ROLE_USER);
         user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());

@@ -6,7 +6,7 @@ import com.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
+
 
 public interface UserService {
 
@@ -19,4 +19,7 @@ public interface UserService {
     UserResponseDTO getUserByToken(HttpServletRequest request);
 
     List<User> fetchAllUser(HttpServletRequest request);
+
+    void cacheUserFromDatabase();
+
 }

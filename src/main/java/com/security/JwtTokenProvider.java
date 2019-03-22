@@ -2,10 +2,13 @@ package com.security;
 
 import com.exception.SecurityException;
 import com.model.enu.RoleEnum;
+import com.service.SystemConfigService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,13 +25,15 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
+    private static Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     private String secretkey = "secret-key";
 
-    private final Long validateTimeToken = 180000L;  // 3600000L -> 1h / 10L * 6 *10000L 10min
+    private Long validateTimeToken ;  // 3600000L -> 1h / 10L * 6 *10000L 10min
 
     @Autowired
-    private MyUserDetails myUserDetails;
+    private SystemConfigService systemConfigService;
+
 
     @PostConstruct
     protected void init() {
@@ -40,6 +45,7 @@ public class JwtTokenProvider {
         claims.put("auth", roles.stream().map(s -> new SimpleGrantedAuthority(s.getName())).
                 filter(Objects::nonNull).collect(Collectors.toList()));
 
+        validateTimeToken = Long.parseLong(systemConfigService.findBySysTitle("tokentime").getSysValue());
 
         Date nowDate = new Date();
         Date expireDate = new Date(nowDate.getTime() + validateTimeToken);

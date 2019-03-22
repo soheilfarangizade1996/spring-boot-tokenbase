@@ -23,24 +23,24 @@ public class UserController {
     private UserService userService;
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public UserResponseDTO singUp(@RequestBody UserDTO userDTO){
+    public UserResponseDTO singUp(@RequestBody UserDTO userDTO) {
         return userService.signUp(userDTO);
     }
 
 
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
-    public UserResponseDTO signin(@RequestBody UserDTO userDTO){
+    public UserResponseDTO signin(@RequestBody UserDTO userDTO) {
         return userService.signIn(userDTO);
     }
 
 
     @RequestMapping(value = "/whoMi", method = RequestMethod.POST)
-    public UserResponseDTO getUser(HttpServletRequest request){
+    public UserResponseDTO getUser(HttpServletRequest request) {
         return userService.getUserByToken(request);
     }
 
     @RequestMapping(value = "fetchAllUser", method = RequestMethod.POST)
-    public List<User> fetchAllUser(HttpServletRequest request){
+    public List<User> fetchAllUser(HttpServletRequest request) {
         return userService.fetchAllUser(request);
     }
 }
