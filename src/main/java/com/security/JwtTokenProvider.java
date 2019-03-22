@@ -42,8 +42,7 @@ public class JwtTokenProvider {
 
     public String createToken(String username, List<RoleEnum> roles) {
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put("auth", roles.stream().map(s -> new SimpleGrantedAuthority(s.getName())).
-                filter(Objects::nonNull).collect(Collectors.toList()));
+        claims.put("auth", roles.stream().map(s -> new SimpleGrantedAuthority(s.getName())).collect(Collectors.toList()));
 
         validateTimeToken = Long.parseLong(systemConfigService.findBySysTitle("tokentime").getSysValue());
 
