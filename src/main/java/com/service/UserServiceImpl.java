@@ -1,5 +1,6 @@
 package com.service;
 
+import com.config.PasswordEncoder;
 import com.dto.UserDTO;
 import com.dto.UserResponseDTO;
 import com.model.User;
@@ -15,7 +16,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -143,14 +143,13 @@ public class UserServiceImpl extends BaseService implements UserService {
         roleEnums.add(RoleEnum.ROLE_ADMIN);
         roleEnums.add(RoleEnum.ROLE_USER);
         user.setUsername(userDTO.getUsername());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setPassword(passwordEncoder.encodePassSHA1(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
         user.setRoles(roleEnums);
         user.setMobile(userDTO.getMobile());
         user = userRepository.save(user);
         user.setStatusCode(200);
         user.setMessage("User Saved...");
-        System.out.println(user.getPassword());
         return user;
     }
 

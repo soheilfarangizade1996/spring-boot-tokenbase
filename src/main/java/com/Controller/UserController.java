@@ -1,5 +1,6 @@
 package com.Controller;
 
+import com.config.PasswordEncoder;
 import com.dto.UserDTO;
 import com.dto.UserResponseDTO;
 import com.model.User;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("user")
@@ -21,6 +21,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public UserResponseDTO singUp(@RequestBody UserDTO userDTO) {
@@ -43,4 +47,13 @@ public class UserController {
     public List<User> fetchAllUser(HttpServletRequest request) {
         return userService.fetchAllUser(request);
     }
+
+
+    @RequestMapping(value = "test", method = RequestMethod.POST)
+    public String test(@RequestBody UserDTO userDTO) {
+        String pass = passwordEncoder.encodePassSHA1(userDTO.getPassword());
+        System.out.println(pass);
+        return pass;
+    }
+
 }
