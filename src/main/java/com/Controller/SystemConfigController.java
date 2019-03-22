@@ -24,7 +24,7 @@ public class SystemConfigController {
     }
 
     @RequestMapping(value = "get", method = RequestMethod.GET)
-    public Collection<List<SystemConfig>> getSysConfig(){
+    public List<SystemConfig> getSysConfig(){
         return systemConfigService.fetchAll();
     }
 }

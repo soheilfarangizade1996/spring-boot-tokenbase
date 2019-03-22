@@ -7,9 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,11 +38,14 @@ public class SystemConfigServiceImpl extends BaseService implements SystemConfig
         } else {
             cacheSysConfig.put(CACHE_SYSCONFIG, lstSysConfig);
         }
+        logger.info("size List cache SysConfig {} " , (long) cacheSysConfig.entrySet().size());
     }
 
     @Override
-    public Collection<List<SystemConfig>> fetchAll() {
-        return cacheSysConfig.values();
+    public List<SystemConfig> fetchAll() {
+        List<SystemConfig> lstFindAll = new ArrayList<>();
+        cacheSysConfig.forEach((key, value) -> lstFindAll.addAll(value));
+        return lstFindAll;
     }
 
     @Override
@@ -52,7 +53,7 @@ public class SystemConfigServiceImpl extends BaseService implements SystemConfig
         List<SystemConfig> lst = new ArrayList<>();
         cacheSysConfig.forEach((key, value) -> lst.addAll(value));
         logger.info("size list sysConfig {}", lst.size());
-        List<SystemConfig> lstFinal = lst.stream().filter((a) -> a.getSysTitle().equals(sysTitle)).collect(Collectors.toList());
+        List<SystemConfig> lstFinal = lst.stream().filter((sys) -> sys.getSysTitle().equals(sysTitle)).collect(Collectors.toList());
         return lstFinal.get(0);
     }
 }
